@@ -1,0 +1,26 @@
+{
+  "web": {
+    "port": 3001,
+    "read_timeout": 10,
+    "write_timeout": 10,
+    "idle_timeout": 10
+  },
+  "database": {
+    "host": "product-service-mysql-e2e",
+    "port": 3306,
+    "username": "root",
+    "password": "password",
+    "name": "product_service_test",
+    "auto_migrate": true,
+    "ssl": false,
+    "params": "parseTime=true&charset=utf8mb4&multiStatements=true",
+    "pool": {
+      "idle": 10,
+      "open": 100,
+      "lifetime": 30
+    }
+  },
+  "log": {
+    "level": "debug"
+  }
+}

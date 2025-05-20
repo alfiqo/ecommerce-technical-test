@@ -1,0 +1,906 @@
+basePath: /api/v1
+definitions:
+  model.CreateOrderRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.OrderItemRequest'
+        type: array
+      payment_method:
+        maxLength: 50
+        type: string
+      shipping_address:
+        type: string
+      user_id:
+        type: string
+    required:
+    - items
+    - payment_method
+    - shipping_address
+    - user_id
+    type: object
+  model.InventoryBatchRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.InventoryQuery'
+        type: array
+    required:
+    - items
+    type: object
+  model.InventoryBatchResponse:
+    properties:
+      items:
+        additionalProperties:
+          $ref: '#/definitions/model.InventoryResponse'
+        type: object
+    type: object
+  model.InventoryQuery:
+    properties:
+      product_id:
+        type: integer
+      warehouse_id:
+        type: integer
+    required:
+    - product_id
+    - warehouse_id
+    type: object
+  model.InventoryResponse:
+    properties:
+      available_quantity:
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      reserved_quantity:
+        type: integer
+      warehouse_id:
+        type: integer
+    type: object
+  model.OrderItemRequest:
+    properties:
+      order_id:
+        description: Added for compatibility with warehouse service
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        minimum: 1
+        type: integer
+      unit_price:
+        minimum: 0
+        type: number
+      warehouse_id:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    - unit_price
+    - warehouse_id
+    type: object
+  model.OrderItemResponse:
+    properties:
+      id:
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      total_price:
+        type: number
+      unit_price:
+        type: number
+      warehouse_id:
+        type: integer
+    type: object
+  model.OrderResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/model.OrderItemResponse'
+        type: array
+      payment_deadline:
+        type: string
+      payment_method:
+        type: string
+      shipping_address:
+        type: string
+      status:
+        type: string
+      total_amount:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.ReservationRequest:
+    properties:
+      expires_at:
+        type: string
+      order_id:
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        minimum: 1
+        type: integer
+      warehouse_id:
+        type: integer
+    required:
+    - expires_at
+    - order_id
+    - product_id
+    - quantity
+    - warehouse_id
+    type: object
+  model.ReservationResponse:
+    properties:
+      created_at:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      order_id:
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      warehouse_id:
+        type: integer
+    type: object
+  model.StockOperationRequest:
+    properties:
+      order_id:
+        type: integer
+      reservation_id:
+        type: string
+    required:
+    - order_id
+    type: object
+  model.StockOperationResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  model.StockReservationItem:
+    properties:
+      available:
+        type: boolean
+      message:
+        type: string
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      warehouse_id:
+        type: integer
+    type: object
+  model.StockReservationRequest:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.OrderItemRequest'
+        type: array
+      order_id:
+        type: integer
+      reserve_until:
+        type: string
+    required:
+    - items
+    - order_id
+    type: object
+  model.StockReservationResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.StockReservationItem'
+        type: array
+      message:
+        type: string
+      order_id:
+        type: integer
+      reservation_id:
+        type: string
+      reserved_until:
+        type: string
+      success:
+        type: boolean
+    type: object
+  model.UpdateOrderStatusRequest:
+    properties:
+      status:
+        enum:
+        - pending
+        - paid
+        - cancelled
+        - completed
+        type: string
+    required:
+    - status
+    type: object
+  model.WarehouseConfig:
+    properties:
+      async_mode:
+        description: When true, uses RabbitMQ messaging; when false, uses direct HTTP calls
+        type: boolean
+      base_url:
+        type: string
+      max_retries:
+        type: integer
+      timeout:
+        description: Timeout for HTTP requests (e.g., "15s")
+        type: string
+    type: object
+  model.WarehouseReservationRequest:
+    properties:
+      order_id:
+        type: integer
+      order_items:
+        items:
+          $ref: '#/definitions/model.OrderItemRequest'
+        type: array
+      reserve_until:
+        description: RFC3339 formatted timestamp (e.g., "2025-05-20T15:00:00Z")
+        type: string
+    required:
+    - order_id
+    - order_items
+    type: object
+  response.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/response.ErrorInfo'
+      success:
+        example: false
+        type: boolean
+    type: object
+  response.SuccessResponse:
+    properties:
+      data: {}
+      success:
+        example: true
+        type: boolean
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: API documentation for Order Service
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Order Service API
+  version: "1.0"
+paths:
+  /config/warehouse:
+    get:
+      description: Returns the current warehouse service configuration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WarehouseConfig'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get warehouse service configuration
+      tags:
+      - Configuration
+    put:
+      consumes:
+      - application/json
+      description: Updates the warehouse service configuration
+      parameters:
+      - description: Warehouse configuration
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/model.WarehouseConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update warehouse service configuration
+      tags:
+      - Configuration
+  /inventory/{product_id}/{warehouse_id}:
+    get:
+      consumes:
+      - application/json
+      description: Returns current inventory level for a specific product at a warehouse
+      parameters:
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: integer
+      - description: Warehouse ID
+        in: path
+        name: warehouse_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.InventoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get inventory for a product
+      tags:
+      - Inventory
+  /inventory/batch:
+    post:
+      consumes:
+      - application/json
+      description: Returns current inventory levels for multiple products across warehouses
+      parameters:
+      - description: Inventory query request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.InventoryBatchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.InventoryBatchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get inventory for multiple products
+      tags:
+      - Inventory
+  /inventory/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirms the deduction of reserved stock for an order (typically
+        after payment). Calls the warehouse service endpoint at /api/v1/inventory/commit.
+      parameters:
+      - description: Stock operation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.StockOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.StockOperationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Confirm stock deduction for an order
+      tags:
+      - Inventory
+  /inventory/release:
+    post:
+      consumes:
+      - application/json
+      description: Releases a previously created stock reservation, making the stock
+        available again. Calls the warehouse service endpoint at /api/v1/inventory/cancel.
+      parameters:
+      - description: Stock operation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.StockOperationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.StockOperationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Release a stock reservation
+      tags:
+      - Inventory
+  /inventory/reserve:
+    post:
+      consumes:
+      - application/json
+      description: Creates stock reservations for items in an order. Uses either synchronous 
+        HTTP calls or asynchronous messaging based on configuration.
+      parameters:
+      - description: Stock reservation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.StockReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.StockReservationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Reserve stock for an order
+      tags:
+      - Inventory
+  /orders:
+    get:
+      description: Returns paginated list of orders for the specified user ID
+      parameters:
+      - description: User ID (defaults to authenticated user)
+        in: query
+        name: user_id
+        type: string
+      - description: Page number (defaults to 1)
+        in: query
+        name: page
+        type: integer
+      - description: Items per page (defaults to 10, max 100)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.OrderResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get orders for a user
+      tags:
+      - Orders
+    post:
+      consumes:
+      - application/json
+      description: Create a new order with items
+      parameters:
+      - description: Order creation request
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new order
+      tags:
+      - Orders
+  /orders/{id}:
+    get:
+      description: Returns order details for the specified ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get order by ID
+      tags:
+      - Orders
+  /orders/{id}/payment:
+    post:
+      description: Process payment for a pending order
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Process payment for an order
+      tags:
+      - Orders
+  /orders/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Update the status of an order
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New order status
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update order status
+      tags:
+      - Orders
+  /orders/{order_id}/reservations:
+    get:
+      description: Returns all stock reservations for the specified order ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ReservationResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get reservations for an order
+      tags:
+      - Reservations
+  /reservations:
+    post:
+      consumes:
+      - application/json
+      description: Create a new stock reservation for an order
+      parameters:
+      - description: Reservation details
+        in: body
+        name: reservation
+        required: true
+        schema:
+          $ref: '#/definitions/model.ReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.ReservationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a stock reservation
+      tags:
+      - Reservations
+  /reservations/{id}/deactivate:
+    post:
+      description: Deactivate a stock reservation
+      parameters:
+      - description: Reservation ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Deactivate a reservation
+      tags:
+      - Reservations
+  /reservations/cleanup:
+    post:
+      description: Deactivate all expired stock reservations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Cleanup expired reservations
+      tags:
+      - Reservations
+  /warehouse/health:
+    get:
+      description: Checks the health of the connection to the warehouse service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Check warehouse service connection
+      tags:
+      - Warehouse
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-Key
+    type: apiKey
+swagger: "2.0"

@@ -1,0 +1,362 @@
+basePath: /api/v1
+definitions:
+  model.CreateProductRequest:
+    properties:
+      category:
+        maxLength: 100
+        type: string
+      description:
+        type: string
+      image_url:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 255
+        type: string
+      price:
+        type: number
+      sku:
+        maxLength: 50
+        type: string
+      stock:
+        minimum: 0
+        type: integer
+    required:
+    - name
+    - price
+    type: object
+  model.ErrorResponse:
+    properties:
+      errors:
+        type: string
+    type: object
+  model.ProductListResponse:
+    properties:
+      count:
+        type: integer
+      limit:
+        type: integer
+      offset:
+        type: integer
+      products:
+        items:
+          $ref: '#/definitions/model.ProductResponse'
+        type: array
+    type: object
+  model.ProductListResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/model.ProductListResponse'
+      errors:
+        type: string
+    type: object
+  model.ProductResponse:
+    properties:
+      category:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      sku:
+        type: string
+      stock:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  model.ProductResponseWrapper:
+    properties:
+      data:
+        $ref: '#/definitions/model.ProductResponse'
+      errors:
+        type: string
+    type: object
+  model.UpdateProductRequest:
+    properties:
+      category:
+        maxLength: 100
+        type: string
+      description:
+        type: string
+      image_url:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 255
+        type: string
+      price:
+        type: number
+      sku:
+        maxLength: 50
+        type: string
+      stock:
+        minimum: 0
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a product service API in Go using Fiber framework.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Product Service API
+  version: "1.0"
+paths:
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of products with pagination
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ProductListResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get a list of products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Create a new product
+      parameters:
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ProductResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create a new product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete a product
+      tags:
+      - products
+    get:
+      consumes:
+      - application/json
+      description: Get a single product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ProductResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get a single product by ID
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Update an existing product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ProductResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update an existing product
+      tags:
+      - products
+  /products/category/{category}:
+    get:
+      consumes:
+      - application/json
+      description: Get products filtered by category
+      parameters:
+      - description: Category
+        in: path
+        name: category
+        required: true
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ProductListResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get products by category
+      tags:
+      - products
+  /products/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for products based on a query string
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ProductListResponseWrapper'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Search for products
+      tags:
+      - products
+schemes:
+- http
+- https
+swagger: "2.0"

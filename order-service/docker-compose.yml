@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./config.docker.json:/app/config.json
+    networks:
+      - user-service-network
+    command: sh -c "./scripts/run-migrations.sh && ./user-service"
+
+  mysql:
+    image: mysql:8.0
+    container_name: user-service-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: order_service
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - user-service-network
+
+networks:
+  user-service-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

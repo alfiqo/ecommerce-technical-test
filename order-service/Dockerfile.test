@@ -1,0 +1,22 @@
+FROM golang:1.24-alpine
+
+WORKDIR /app
+
+# Copy go.mod and go.sum files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code (excluding e2e tests which will be mounted as volume)
+COPY . .
+
+# Install test dependencies
+RUN apk add --no-cache curl wget
+
+# Set up environment
+ENV CGO_ENABLED=0 \
+    GO111MODULE=on
+
+# Command to run tests
+CMD ["go", "test", "-v", "./e2e", "-timeout", "2m"]

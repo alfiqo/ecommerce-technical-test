@@ -1,0 +1,11 @@
+CREATE TABLE users (
+    uuid       CHAR(36) NOT NULL,           
+    name       VARCHAR(255) NOT NULL,
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    phone      VARCHAR(50) UNIQUE,
+    password   VARCHAR(100) NOT NULL,
+    token      VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (uuid)
+) ENGINE = InnoDB;

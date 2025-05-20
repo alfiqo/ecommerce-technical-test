@@ -1,0 +1,1395 @@
+{
+  "swagger": "2.0",
+  "basePath": "/api/v1",
+  "host": "localhost:3000",
+  "info": {
+    "title": "Order Service API",
+    "description": "API documentation for Order Service",
+    "version": "1.0",
+    "contact": {
+      "name": "API Support",
+      "email": "support@example.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header"
+    }
+  },
+  "paths": {
+    "/inventory/{product_id}/{warehouse_id}": {
+      "get": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "Get inventory for a product",
+        "description": "Returns current inventory level for a specific product at a warehouse",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "description": "Product ID",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "warehouse_id",
+            "in": "path",
+            "description": "Warehouse ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/model.InventoryResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/inventory/batch": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "Get inventory for multiple products",
+        "description": "Returns current inventory levels for multiple products across warehouses",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Inventory query request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.InventoryBatchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/model.InventoryBatchResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/inventory/confirm": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "Confirm stock deduction for an order",
+        "description": "Confirms the deduction of reserved stock for an order (typically after payment). Calls the warehouse service endpoint at /api/v1/inventory/commit.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Stock operation request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.StockOperationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/model.StockOperationResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/inventory/release": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "Release a stock reservation",
+        "description": "Releases a previously created stock reservation, making the stock available again. Calls the warehouse service endpoint at /api/v1/inventory/cancel.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Stock operation request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.StockOperationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/model.StockOperationResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/inventory/reserve": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "Reserve stock for an order",
+        "description": "Creates stock reservations for items in an order. Uses either synchronous HTTP calls or asynchronous messaging based on configuration.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "description": "Stock reservation request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.StockReservationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/model.StockReservationResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/config/warehouse": {
+      "get": {
+        "tags": [
+          "Configuration"
+        ],
+        "summary": "Get warehouse service configuration",
+        "description": "Returns the current warehouse service configuration",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/model.WarehouseConfig"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Configuration"
+        ],
+        "summary": "Update warehouse service configuration",
+        "description": "Updates the warehouse service configuration",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "config",
+            "in": "body",
+            "description": "Warehouse configuration",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.WarehouseConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/response.SuccessResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/warehouse/health": {
+      "get": {
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Check warehouse service connection",
+        "description": "Checks the health of the connection to the warehouse service",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/response.SuccessResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get orders for a user",
+        "description": "Returns paginated list of orders for the specified user ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "User ID (defaults to authenticated user)",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (defaults to 1)",
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page (defaults to 10, max 100)",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/model.OrderResponse"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Create a new order",
+        "description": "Create a new order with items",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "body",
+            "description": "Order creation request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.CreateOrderRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/model.OrderResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get order by ID",
+        "description": "Returns order details for the specified ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Order ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/model.OrderResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/orders/{id}/payment": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Process payment for an order",
+        "description": "Process payment for a pending order",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Order ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/response.SuccessResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/orders/{id}/status": {
+      "patch": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Update order status",
+        "description": "Update the status of an order",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Order ID",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "status",
+            "in": "body",
+            "description": "New order status",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.UpdateOrderStatusRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/response.SuccessResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/orders/{order_id}/reservations": {
+      "get": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Get reservations for an order",
+        "description": "Returns all stock reservations for the specified order ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "Order ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/model.ReservationResponse"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/reservations": {
+      "post": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Create a stock reservation",
+        "description": "Create a new stock reservation for an order",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "reservation",
+            "in": "body",
+            "description": "Reservation details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/model.ReservationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/model.ReservationResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/reservations/cleanup": {
+      "post": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Cleanup expired reservations",
+        "description": "Deactivate all expired stock reservations",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/response.SuccessResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/reservations/{id}/deactivate": {
+      "post": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Deactivate a reservation",
+        "description": "Deactivate a stock reservation",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Reservation ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/response.SuccessResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/response.ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "model.CreateOrderRequest": {
+      "type": "object",
+      "required": [
+        "items",
+        "payment_method",
+        "shipping_address",
+        "user_id"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/model.OrderItemRequest"
+          }
+        },
+        "payment_method": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "shipping_address": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "model.InventoryBatchRequest": {
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/model.InventoryQuery"
+          }
+        }
+      }
+    },
+    "model.InventoryBatchResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/model.InventoryResponse"
+          }
+        }
+      }
+    },
+    "model.InventoryQuery": {
+      "type": "object",
+      "required": [
+        "product_id",
+        "warehouse_id"
+      ],
+      "properties": {
+        "product_id": {
+          "type": "integer"
+        },
+        "warehouse_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "model.InventoryResponse": {
+      "type": "object",
+      "properties": {
+        "available_quantity": {
+          "type": "integer"
+        },
+        "product_id": {
+          "type": "integer"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "reserved_quantity": {
+          "type": "integer"
+        },
+        "warehouse_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "model.OrderItemRequest": {
+      "type": "object",
+      "required": [
+        "product_id",
+        "quantity",
+        "unit_price",
+        "warehouse_id"
+      ],
+      "properties": {
+        "order_id": {
+          "type": "integer",
+          "description": "Added for compatibility with warehouse service"
+        },
+        "product_id": {
+          "type": "integer"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "unit_price": {
+          "type": "number",
+          "minimum": 0
+        },
+        "warehouse_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "model.OrderItemResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "product_id": {
+          "type": "integer"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "total_price": {
+          "type": "number"
+        },
+        "unit_price": {
+          "type": "number"
+        },
+        "warehouse_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "model.OrderResponse": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/model.OrderItemResponse"
+          }
+        },
+        "payment_deadline": {
+          "type": "string"
+        },
+        "payment_method": {
+          "type": "string"
+        },
+        "shipping_address": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "total_amount": {
+          "type": "number"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      }
+    },
+    "model.ReservationRequest": {
+      "type": "object",
+      "required": [
+        "expires_at",
+        "order_id",
+        "product_id",
+        "quantity",
+        "warehouse_id"
+      ],
+      "properties": {
+        "expires_at": {
+          "type": "string"
+        },
+        "order_id": {
+          "type": "integer"
+        },
+        "product_id": {
+          "type": "integer"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "warehouse_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "model.ReservationResponse": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string"
+        },
+        "expires_at": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "order_id": {
+          "type": "integer"
+        },
+        "product_id": {
+          "type": "integer"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "warehouse_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "model.StockOperationRequest": {
+      "type": "object",
+      "required": [
+        "order_id"
+      ],
+      "properties": {
+        "order_id": {
+          "type": "integer"
+        },
+        "reservation_id": {
+          "type": "string"
+        }
+      }
+    },
+    "model.StockOperationResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "model.StockReservationItem": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "integer"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "warehouse_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "model.StockReservationRequest": {
+      "type": "object",
+      "required": [
+        "items",
+        "order_id"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/model.OrderItemRequest"
+          }
+        },
+        "order_id": {
+          "type": "integer"
+        },
+        "reserve_until": {
+          "type": "string"
+        }
+      }
+    },
+    "model.StockReservationResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/model.StockReservationItem"
+          }
+        },
+        "message": {
+          "type": "string"
+        },
+        "order_id": {
+          "type": "integer"
+        },
+        "reservation_id": {
+          "type": "string"
+        },
+        "reserved_until": {
+          "type": "string"
+        },
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "model.UpdateOrderStatusRequest": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "paid",
+            "cancelled",
+            "completed"
+          ]
+        }
+      }
+    },
+    "model.WarehouseConfig": {
+      "type": "object",
+      "properties": {
+        "async_mode": {
+          "type": "boolean",
+          "description": "When true, uses RabbitMQ messaging; when false, uses direct HTTP calls"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "max_retries": {
+          "type": "integer"
+        },
+        "timeout": {
+          "type": "string",
+          "description": "Timeout for HTTP requests (e.g., \"15s\")"
+        }
+      }
+    },
+    "model.WarehouseReservationRequest": {
+      "type": "object",
+      "required": [
+        "order_id",
+        "order_items"
+      ],
+      "properties": {
+        "order_id": {
+          "type": "integer"
+        },
+        "order_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/model.OrderItemRequest"
+          }
+        },
+        "reserve_until": {
+          "type": "string",
+          "description": "RFC3339 formatted timestamp (e.g., \"2025-05-20T15:00:00Z\")"
+        }
+      }
+    },
+    "response.ErrorInfo": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "response.ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/response.ErrorInfo"
+        },
+        "success": {
+          "type": "boolean",
+          "example": false
+        }
+      }
+    },
+    "response.SuccessResponse": {
+      "type": "object",
+      "properties": {
+        "data": {},
+        "success": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    }
+  }
+}

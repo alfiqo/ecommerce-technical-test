@@ -1,0 +1,73 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: product-service-mysql-e2e
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: product_service_test
+      MYSQL_ROOT_HOST: '%'  # Allow connections from any host
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mysql-data-e2e:/var/lib/mysql
+    networks:
+      - product-service-network
+
+  product-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
+    container_name: product-service-e2e
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    environment:
+      - ENV=e2e
+    volumes:
+      - ./:/app
+    networks:
+      - product-service-network
+    # Debug connection issues
+    command: >
+      sh -c "
+        echo 'Testing connectivity to MySQL...' &&
+        ping -c 3 product-service-mysql-e2e &&
+        sleep 5 &&
+        echo 'Trying to connect to MySQL...' &&
+        mysql -h product-service-mysql-e2e -u root -ppassword --ssl=0 -e 'SHOW DATABASES;' &&
+        echo 'Connection successful! Running migrations...' &&
+        ./scripts/run-migrations.sh &&
+        go run cmd/web/main.go
+      "
+
+  e2e-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
+    container_name: product-service-e2e-tests
+    depends_on:
+      product-service:
+        condition: service_started
+    volumes:
+      - ./:/app
+      - ./test-results:/app/test-results
+    networks:
+      - product-service-network
+    command: sh -c "until nc -z -v product-service 3001; do echo 'Waiting for product-service to be ready...'; sleep 2; done && go test ./e2e/... -v"
+
+volumes:
+  mysql-data-e2e:
+
+networks:
+  product-service-network:
+    driver: bridge

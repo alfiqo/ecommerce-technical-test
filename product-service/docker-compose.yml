@@ -1,0 +1,41 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: product-service-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: product_service
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - product-service-network
+
+  product-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: product-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./:/app
+    networks:
+      - product-service-network
+    command: sh -c "./scripts/run-migrations.sh && go run cmd/web/main.go"
+
+volumes:
+  mysql-data:
+
+networks:
+  product-service-network:
+    driver: bridge

@@ -1,0 +1,889 @@
+basePath: /api/v1
+definitions:
+  model.AddStockRequest:
+    properties:
+      notes:
+        type: string
+      product_id:
+        type: integer
+      product_sku:
+        type: string
+      quantity:
+        type: integer
+      reference:
+        type: string
+      warehouse_id:
+        type: integer
+    required:
+    - product_id
+    - product_sku
+    - quantity
+    - reference
+    - warehouse_id
+    type: object
+  model.CancelReservationRequest:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      reference:
+        type: string
+      warehouse_id:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    - reference
+    - warehouse_id
+    type: object
+  model.CommitReservationRequest:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      reference:
+        type: string
+      warehouse_id:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    - reference
+    - warehouse_id
+    type: object
+  model.CreateWarehouseRequest:
+    properties:
+      address:
+        maxLength: 500
+        type: string
+      is_active:
+        type: boolean
+      location:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 255
+        type: string
+    required:
+    - address
+    - location
+    - name
+    type: object
+  model.ReservationHistoryResponse:
+    properties:
+      limit:
+        type: integer
+      logs:
+        items:
+          $ref: '#/definitions/model.ReservationLogResponse'
+        type: array
+      page:
+        type: integer
+      product_id:
+        type: integer
+      total:
+        type: integer
+      warehouse_id:
+        type: integer
+    type: object
+  model.ReservationLogResponse:
+    properties:
+      created_at:
+        type: string
+      quantity:
+        type: integer
+      reference:
+        type: string
+      status:
+        $ref: '#/definitions/model.ReservationStatus'
+    type: object
+  model.ReservationResponse:
+    properties:
+      available_quantity:
+        type: integer
+      product_id:
+        type: integer
+      reference:
+        type: string
+      reservation_time:
+        type: string
+      reserved_quantity:
+        type: integer
+      status:
+        $ref: '#/definitions/model.ReservationStatus'
+      total_quantity:
+        type: integer
+      warehouse_id:
+        type: integer
+    type: object
+  model.ReservationStatus:
+    enum:
+    - pending
+    - committed
+    - cancelled
+    type: string
+    x-enum-varnames:
+    - ReservationStatusPending
+    - ReservationStatusCommitted
+    - ReservationStatusCancelled
+  model.ReserveStockRequest:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      warehouse_id:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    - warehouse_id
+    type: object
+  model.StockItemResponse:
+    properties:
+      available_quantity:
+        type: integer
+      product_id:
+        type: integer
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      reserved_quantity:
+        type: integer
+      sku:
+        type: string
+      updated_at:
+        type: string
+      warehouse_id:
+        type: integer
+    type: object
+  model.StockResponse:
+    properties:
+      available_quantity:
+        type: integer
+      product_id:
+        type: integer
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      reserved_quantity:
+        type: integer
+      sku:
+        type: string
+      updated_at:
+        type: string
+      warehouse_id:
+        type: integer
+    type: object
+  model.StockTransferRequest:
+    properties:
+      notes:
+        type: string
+      product_id:
+        type: integer
+      product_sku:
+        type: string
+      quantity:
+        type: integer
+      reference:
+        type: string
+      source_warehouse_id:
+        type: integer
+      target_warehouse_id:
+        type: integer
+    required:
+    - product_id
+    - product_sku
+    - quantity
+    - source_warehouse_id
+    - target_warehouse_id
+    type: object
+  model.StockTransferResponse:
+    properties:
+      created_at:
+        type: string
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      source_warehouse_id:
+        type: integer
+      status:
+        type: string
+      target_warehouse_id:
+        type: integer
+      transfer_id:
+        type: integer
+      transfer_reference:
+        type: string
+    type: object
+  model.UpdateWarehouseRequest:
+    properties:
+      address:
+        maxLength: 500
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      location:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 255
+        type: string
+    required:
+    - address
+    - id
+    - location
+    - name
+    type: object
+  model.WarehouseListResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      warehouses:
+        items:
+          $ref: '#/definitions/model.WarehouseResponse'
+        type: array
+    type: object
+  model.WarehouseResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      location:
+        type: string
+      name:
+        type: string
+      stats:
+        $ref: '#/definitions/model.WarehouseStatsDTO'
+      updated_at:
+        type: string
+    type: object
+  model.WarehouseStatsDTO:
+    properties:
+      total_items:
+        type: integer
+      total_products:
+        type: integer
+    type: object
+  model.WarehouseStockListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.StockItemResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+      warehouse_id:
+        type: integer
+    type: object
+  response.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/response.ErrorInfo'
+      success:
+        example: false
+        type: boolean
+    type: object
+  response.SuccessMessageResponse:
+    properties:
+      data:
+        properties:
+          message:
+            example: Operation completed successfully
+            type: string
+        type: object
+      success:
+        example: true
+        type: boolean
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: API documentation for Warehouse Service
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Warehouse Service API
+  version: "1.0"
+paths:
+  /inventory/reserve:
+    post:
+      consumes:
+      - application/json
+      description: Reserves stock for a product in a warehouse using database-level
+        locking
+      parameters:
+      - description: Reservation details
+        in: body
+        name: reservation
+        required: true
+        schema:
+          $ref: '#/definitions/model.ReserveStockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ReservationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Reserve inventory stock
+      tags:
+      - Inventory
+  /inventory/reserve/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancels a previously made stock reservation
+      parameters:
+      - description: Cancellation details
+        in: body
+        name: cancelation
+        required: true
+        schema:
+          $ref: '#/definitions/model.CancelReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessMessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Cancel a stock reservation
+      tags:
+      - Inventory
+  /inventory/reserve/commit:
+    post:
+      consumes:
+      - application/json
+      description: Commits a previously made stock reservation, reducing actual stock
+      parameters:
+      - description: Commit details
+        in: body
+        name: commit
+        required: true
+        schema:
+          $ref: '#/definitions/model.CommitReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessMessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Commit a stock reservation
+      tags:
+      - Inventory
+  /inventory/warehouses/{warehouse_id}/products/{product_id}/reservations:
+    get:
+      description: Returns the reservation history for a product in a warehouse
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: warehouse_id
+        required: true
+        type: integer
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: integer
+      - description: Page number (defaults to 1)
+        in: query
+        name: page
+        type: integer
+      - description: Items per page (defaults to 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ReservationHistoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get reservation history
+      tags:
+      - Inventory
+  /stock/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfers stock from one warehouse to another for a specific product
+      parameters:
+      - description: Stock transfer details
+        in: body
+        name: transfer
+        required: true
+        schema:
+          $ref: '#/definitions/model.StockTransferRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.StockTransferResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Transfer stock between warehouses
+      tags:
+      - Stock
+  /warehouses:
+    get:
+      description: Returns a paginated list of warehouses
+      parameters:
+      - description: Page number (defaults to 1)
+        in: query
+        name: page
+        type: integer
+      - description: Items per page (defaults to 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WarehouseListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List warehouses
+      tags:
+      - Warehouses
+    post:
+      consumes:
+      - application/json
+      description: Creates a new warehouse
+      parameters:
+      - description: Warehouse creation details
+        in: body
+        name: warehouse
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateWarehouseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.WarehouseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new warehouse
+      tags:
+      - Warehouses
+  /warehouses/{id}:
+    delete:
+      description: Deletes an existing warehouse by ID
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessMessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a warehouse
+      tags:
+      - Warehouses
+    get:
+      description: Returns warehouse details for the specified ID with statistics
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WarehouseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get warehouse by ID
+      tags:
+      - Warehouses
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing warehouse
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Warehouse update details
+        in: body
+        name: warehouse
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateWarehouseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WarehouseResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update an existing warehouse
+      tags:
+      - Warehouses
+  /warehouses/{warehouseId}/stock:
+    get:
+      description: Returns a paginated list of stock items in a warehouse
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: warehouseId
+        required: true
+        type: string
+      - description: Product ID filter
+        in: query
+        name: productId
+        type: string
+      - description: Page number (defaults to 1)
+        in: query
+        name: page
+        type: integer
+      - description: Items per page (defaults to 20, max 100)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WarehouseStockListResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get warehouse stock
+      tags:
+      - Stock
+    post:
+      consumes:
+      - application/json
+      description: Adds stock to a warehouse for a specific product
+      parameters:
+      - description: Warehouse ID
+        in: path
+        name: warehouseId
+        required: true
+        type: string
+      - description: Stock details to add
+        in: body
+        name: stock
+        required: true
+        schema:
+          $ref: '#/definitions/model.AddStockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.StockResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Add stock to a warehouse
+      tags:
+      - Stock
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    description: API key authentication
+    in: header
+    name: X-API-Key
+    type: apiKey
+swagger: "2.0"

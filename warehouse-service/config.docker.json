@@ -1,0 +1,24 @@
+{
+  "app": {
+    "name": "warehouse-service"
+  },
+  "web": {
+    "prefork": false,
+    "port": 3000
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "root",
+    "password": "",
+    "host": "mysql",
+    "port": 3306,
+    "name": "warehouse_service",
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "app": {
+    "name": "warehouse-service-test"
+  },
+  "web": {
+    "prefork": false,
+    "port": 3000
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "root",
+    "password": "",
+    "host": "mysql",
+    "port": 3306,
+    "name": "warehouse_service_test",
+    "ssl_mode": "false",
+    "auto_migrate": true,
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  }
+}

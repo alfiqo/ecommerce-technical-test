@@ -1,0 +1,191 @@
+basePath: /api/v1
+definitions:
+  model.LoginUserRequest:
+    properties:
+      email:
+        maxLength: 100
+        type: string
+      password:
+        maxLength: 100
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.RegisterUserRequest:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 255
+        type: string
+      password:
+        maxLength: 100
+        type: string
+      phone:
+        maxLength: 50
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  model.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      token:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/response.ErrorInfo'
+      success:
+        example: false
+        type: boolean
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: API documentation for User Service
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: User Service API
+  version: "1.0"
+paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: User registration details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Users
+  /users/{id}:
+    get:
+      description: Returns user details for the specified ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - Users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a token
+      parameters:
+      - description: User login credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: User login
+      tags:
+      - Users
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

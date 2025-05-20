@@ -1,0 +1,45 @@
+{
+  "app": {
+    "name": "order-service",
+    "env": "development"
+  },
+  "web": {
+    "prefork": false,
+    "port": 3000
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "root",
+    "password": "",
+    "host": "localhost",
+    "port": 3306,
+    "name": "order_service",
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  },
+  "warehouse": {
+    "base_url": "http://localhost:3001",
+    "timeout": "15s",
+    "api_key": "",
+    "max_retries": 3,
+    "retry_delay": "1s",
+    "async_mode": false,
+    "queue_name": "inventory-operations",
+    "mq_address": "localhost:5672",
+    "mq_username": "guest",
+    "mq_password": "guest"
+  },
+  "rabbitmq": {
+    "host": "localhost",
+    "port": 5672,
+    "username": "guest",
+    "password": "guest",
+    "exchange": "order-service",
+    "queue": "inventory-operations"
+  }
+}

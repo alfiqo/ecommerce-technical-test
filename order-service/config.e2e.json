@@ -1,0 +1,47 @@
+{
+  "app": {
+    "name": "order-service-test",
+    "env": "testing"
+  },
+  "web": {
+    "prefork": false,
+    "port": 3000
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "root",
+    "password": "",
+    "host": "mysql",
+    "port": 3306,
+    "name": "order_service_test",
+    "ssl_mode": "false",
+    "auto_migrate": true,
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  },
+  "warehouse": {
+    "base_url": "http://warehouse-service:3001",
+    "timeout": "1s",
+    "api_key": "test-api-key",
+    "max_retries": 1,
+    "retry_delay": "100ms",
+    "async_mode": false,
+    "queue_name": "inventory-operations-test",
+    "mq_address": "rabbitmq:5672",
+    "mq_username": "guest",
+    "mq_password": "guest"
+  },
+  "rabbitmq": {
+    "host": "rabbitmq",
+    "port": 5672,
+    "username": "guest",
+    "password": "guest",
+    "exchange": "order-service-test",
+    "queue": "inventory-operations-test"
+  }
+}

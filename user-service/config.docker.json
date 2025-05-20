@@ -1,0 +1,24 @@
+{
+  "app": {
+    "name": "user-service"
+  },
+  "web": {
+    "prefork": false,
+    "port": 3000
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "root",
+    "password": "",
+    "host": "mysql",
+    "port": 3306,
+    "name": "user_service",
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  }
+}

@@ -1,0 +1,3 @@
+cmd/web/config.json
+.vscode/launch.json
+test-results/e2e-test-output.log

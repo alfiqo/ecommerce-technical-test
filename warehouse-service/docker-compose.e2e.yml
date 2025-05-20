@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: warehouse-service-e2e
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./config.e2e.json:/app/config.json
+    networks:
+      - warehouse-service-e2e-network
+    command: ./warehouse-service
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://0.0.0.0:3000/api/v1/health || exit 0"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+
+  mysql:
+    image: mysql:8.0
+    container_name: warehouse-service-mysql-e2e
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: warehouse_service_test
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_HOST: "%"
+      # Use older authentication plugin compatible with MariaDB client
+      MYSQL_ROOT_PASSWORD: ""
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - warehouse-service-e2e-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--protocol=tcp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: warehouse-service-e2e-test
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - warehouse-service-e2e-network
+    volumes:
+      - ./e2e:/app/e2e
+      - ./test-results:/app/test-results
+
+networks:
+  warehouse-service-e2e-network:
+    driver: bridge
