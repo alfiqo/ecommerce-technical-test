@@ -1,0 +1,25 @@
+{
+  "app": {
+    "name": "shop-service-test"
+  },
+  "web": {
+    "prefork": false,
+    "port": 3002
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "root",
+    "password": "",
+    "host": "localhost",
+    "port": 3306,
+    "name": "shop_service_test",
+    "auto_migrate": true,
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  }
+}

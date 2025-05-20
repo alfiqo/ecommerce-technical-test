@@ -1,0 +1,30 @@
+{
+  "app": {
+    "name": "shop-service"
+  },
+  "web": {
+    "prefork": false,
+    "port": 3000
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "root",
+    "password": "",
+    "host": "localhost",
+    "port": 3306,
+    "name": "shop_service",
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  },
+  "services": {
+    "warehouse": {
+      "url": "http://warehouse-service:8080/api/v1",
+      "timeout": 5000
+    }
+  }
+}

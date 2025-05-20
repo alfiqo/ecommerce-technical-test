@@ -1,0 +1,396 @@
+basePath: /api/v1
+definitions:
+  model.CreateShopRequest:
+    description: Request to create a new shop
+    properties:
+      address:
+        example: 123 Main St, New York, NY 10001
+        type: string
+      contact_email:
+        example: contact@example.com
+        type: string
+      contact_phone:
+        example: +1-555-123-4567
+        type: string
+      description:
+        example: Our flagship bookstore location
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Downtown Bookstore
+        maxLength: 255
+        minLength: 3
+        type: string
+    required:
+    - address
+    - contact_email
+    - contact_phone
+    - name
+    type: object
+  model.ShopDetailResponse:
+    description: Detailed shop information including associated warehouses
+    properties:
+      address:
+        example: 123 Main St, New York, NY 10001
+        type: string
+      contact_email:
+        example: contact@example.com
+        type: string
+      contact_phone:
+        example: +1-555-123-4567
+        type: string
+      created_at:
+        example: "2025-05-18T08:00:00Z"
+        type: string
+      description:
+        example: Our flagship bookstore location
+        type: string
+      id:
+        example: 1
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Downtown Bookstore
+        type: string
+      updated_at:
+        example: "2025-05-18T08:00:00Z"
+        type: string
+      warehouse_ids:
+        items:
+          $ref: '#/definitions/model.WarehouseID'
+        type: array
+    type: object
+  model.ShopListResponse:
+    description: Paginated list of shops
+    properties:
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      shops:
+        items:
+          $ref: '#/definitions/model.ShopResponse'
+        type: array
+      total_count:
+        example: 42
+        type: integer
+    type: object
+  model.ShopResponse:
+    description: Response containing shop information
+    properties:
+      address:
+        example: 123 Main St, New York, NY 10001
+        type: string
+      contact_email:
+        example: contact@example.com
+        type: string
+      contact_phone:
+        example: +1-555-123-4567
+        type: string
+      created_at:
+        example: "2025-05-18T08:00:00Z"
+        type: string
+      description:
+        example: Our flagship bookstore location
+        type: string
+      id:
+        example: 1
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Downtown Bookstore
+        type: string
+      updated_at:
+        example: "2025-05-18T08:00:00Z"
+        type: string
+    type: object
+  model.ShopWarehousesResponse:
+    description: Collection of warehouses associated with a shop
+    properties:
+      shop_id:
+        example: 1
+        type: integer
+      warehouses:
+        items:
+          $ref: '#/definitions/model.WarehouseResponse'
+        type: array
+    type: object
+  model.WarehouseID:
+    description: Reference to a warehouse by ID
+    properties:
+      id:
+        example: 42
+        type: integer
+    type: object
+  model.WarehouseResponse:
+    description: Information about a warehouse
+    properties:
+      address:
+        example: 789 Warehouse Blvd, Springfield, IL 62701
+        type: string
+      capacity:
+        example: 5000
+        type: integer
+      created_at:
+        example: "2025-05-01T08:00:00Z"
+        type: string
+      id:
+        example: 42
+        type: integer
+      is_active:
+        example: true
+        type: boolean
+      name:
+        example: Main Distribution Center
+        type: string
+      updated_at:
+        example: "2025-05-02T10:30:00Z"
+        type: string
+    type: object
+  response.ErrorInfo:
+    description: Detailed error information returned when an error occurs
+    properties:
+      code:
+        example: RESOURCE_NOT_FOUND
+        type: string
+      message:
+        example: The requested resource was not found
+        type: string
+    type: object
+  response.Response:
+    description: Standardized API response format for all endpoints
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/response.ErrorInfo'
+      success:
+        example: true
+        type: boolean
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: API for managing shops and their warehouse associations
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Shop Service API
+  version: "1.0"
+paths:
+  /shops:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of shops
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 10, max: 100)'
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Include inactive shops
+        in: query
+        name: include_inactive
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.ShopListResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+      summary: List shops
+      tags:
+      - shops
+    post:
+      consumes:
+      - application/json
+      description: Create a new shop with the provided information
+      parameters:
+      - description: Shop information
+        in: body
+        name: shop
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateShopRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.ShopResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+      summary: Create a new shop
+      tags:
+      - shops
+  /shops/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed shop information by ID including warehouse references
+      parameters:
+      - description: Shop ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.ShopDetailResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+      summary: Get shop by ID
+      tags:
+      - shops
+  /shops/{id}/warehouses:
+    get:
+      consumes:
+      - application/json
+      description: Get all warehouses associated with a shop
+      parameters:
+      - description: Shop ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.ShopWarehousesResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                error:
+                  $ref: '#/definitions/response.ErrorInfo'
+              type: object
+      summary: Get shop warehouses
+      tags:
+      - shops
+swagger: "2.0"

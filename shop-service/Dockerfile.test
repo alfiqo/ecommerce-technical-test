@@ -1,0 +1,54 @@
+FROM golang:1.24-alpine
+
+WORKDIR /app
+
+# Copy go.mod and go.sum files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code (excluding e2e tests which will be mounted as volume)
+COPY . .
+
+# Install test dependencies
+RUN apk add --no-cache curl wget
+
+# Set up environment
+ENV CGO_ENABLED=0 \
+    GO111MODULE=on \
+    API_HOST=app \
+    API_PORT=3000 \
+    DB_HOST=mysql \
+    DB_PORT=3306 \
+    DB_USER=root \
+    DB_PASS= \
+    DB_NAME=shop_service_test
+
+# Add a script to wait for the app and run tests
+COPY <<EOF /app/wait-and-test.sh
+#!/bin/sh
+set -e
+
+# Wait for the API to be fully up and running
+echo "Waiting for API to be ready..."
+timeout=60
+counter=0
+while ! wget --no-verbose --tries=1 --spider http://app:3000/api/v1/health 2>/dev/null; do
+    sleep 2
+    counter=$((counter + 2))
+    if [ $counter -ge $timeout ]; then
+        echo "Error: API did not become available within $timeout seconds"
+        exit 1
+    fi
+    echo "Still waiting for API... ($counter/$timeout seconds)"
+done
+
+echo "API is ready! Running tests..."
+go test -v ./e2e -timeout 2m
+EOF
+
+RUN chmod +x /app/wait-and-test.sh
+
+# Command to run tests
+CMD ["/app/wait-and-test.sh"]
